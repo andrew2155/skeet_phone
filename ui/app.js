@@ -276,19 +276,39 @@
     renderDots();
   }
 
-  function openApp(appId) {
-    const app = registry.apps[appId];
-    if (!app) return;
+function openApp(appId) {
+  const app = registry.apps[appId];
+  if (!app) return;
 
-    openAppId = appId;
-    homeView.style.display = 'none';
-    appView.style.display = 'block';
-    appBackdrop.classList.add('show');
-    wallpaperEl.classList.add('hidden');
+  openAppId = appId;
+  homeView.style.display = 'none';
+  appView.style.display = 'block';
+  appBackdrop.classList.add('show');
+  wallpaperEl.classList.add('hidden');
 
-    if (appId === 'settings') renderSettings();
-    else appBody.innerHTML = `<div class="glass-bubble" style="padding:14px;border-radius:22px;">App UI coming soon.</div>`;
+  // Settings (native)
+  if (appId === 'settings') {
+    renderSettings();
+    return;
   }
+
+  // iframe apps (modular)
+  if (app.kind === 'iframe' && app.ui && app.resource) {
+    const src = `nui://${app.resource}/${app.ui}`; // nui://skeet_music/ui/index.html
+    appBody.innerHTML = `
+      <iframe
+        src="${src}"
+        style="width:100%;height:100%;border:0;border-radius:22px;overflow:hidden;"
+        allow="autoplay"
+      ></iframe>
+    `;
+    return;
+  }
+
+  // fallback
+  appBody.innerHTML = `App UI coming soon.`;
+}
+
 
   function renderSettings() {
     const wp = profile.wallpaper || { type:'builtin', value: cfg.builtInWallpapers[0] };
