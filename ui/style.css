@@ -1,0 +1,521 @@
+:root{
+  --uiScale: 1.0;
+
+  --screenW: calc(390px * var(--uiScale));
+  --screenH: calc(844px * var(--uiScale));
+  --framePad: calc(6px * var(--uiScale));
+
+  --radiusFrame: calc(60px * var(--uiScale));
+  --radiusScreen: calc(52px * var(--uiScale));
+
+  --radiusIcon: calc(20px * var(--uiScale));
+  --radiusCard: calc(22px * var(--uiScale));
+
+  --text: rgba(255,255,255,.95);
+  --muted: rgba(255,255,255,.70);
+  --blur: calc(28px * var(--uiScale));
+
+  --frameTop: #2b2b2d;
+  --frameBottom: #141416;
+
+  /* App backgrounds */
+  --appDark: rgba(14,16,20,.92);
+  --appLight: rgba(246,247,249,.96);
+
+  /* ✅ status color is theme-driven now */
+  --statusColor: rgba(255,255,255,.95);
+}
+
+html, body{
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:0;
+  background:transparent !important;
+  overflow:hidden;
+}
+#root{
+  position:fixed;
+  inset:0;
+  background:transparent !important;
+}
+
+*{
+  box-sizing:border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Arial;
+  user-select:none;
+}
+
+.hidden{ display:none !important; }
+
+/* Bottom-right phone */
+.phone-wrap{
+  position:absolute;
+  right:4vw;
+  bottom:3vh;
+  width: calc(var(--screenW) + var(--framePad)*2);
+  height: calc(var(--screenH) + var(--framePad)*2);
+  display:none;
+  filter: drop-shadow(0 calc(28px * var(--uiScale)) calc(90px * var(--uiScale)) rgba(0,0,0,.55));
+}
+.phone-wrap.open{ display:block; }
+
+/* ===== YOUR ORIGINAL PREMIUM FRAME LOOK (kept) ===== */
+.frame{
+  position:relative;
+  width:100%;
+  height:100%;
+  border-radius: var(--radiusFrame);
+  padding: var(--framePad);
+  background: linear-gradient(180deg, var(--frameTop), var(--frameBottom));
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -10px 26px rgba(0,0,0,.35);
+}
+.frame::before{
+  content:"";
+  position:absolute;
+  inset: calc(4px * var(--uiScale));
+  border-radius: calc(var(--radiusFrame) - calc(4px * var(--uiScale)));
+  pointer-events:none;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.07),
+    inset 0 12px 22px rgba(255,255,255,.04);
+}
+
+/* Hardware buttons (scaled) */
+.btn-side{
+  position:absolute;
+  width: calc(4px * var(--uiScale));
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(0,0,0,.30));
+  box-shadow:
+    0 3px 12px rgba(0,0,0,.45),
+    inset 0 0 0 1px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.22);
+  opacity: .98;
+}
+.btn-side::before{
+  content:"";
+  position:absolute;
+  left:1px;
+  right:1px;
+  top:calc(4px * var(--uiScale));
+  bottom:calc(4px * var(--uiScale));
+  border-radius:999px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.10),
+    inset 0 8px 12px rgba(255,255,255,.06);
+}
+.btn-mute{ left: calc(-2px * var(--uiScale)); top: calc(122px * var(--uiScale)); height: calc(26px * var(--uiScale)); }
+.btn-vol-up{ left: calc(-2px * var(--uiScale)); top: calc(168px * var(--uiScale)); height: calc(54px * var(--uiScale)); }
+.btn-vol-down{ left: calc(-2px * var(--uiScale)); top: calc(230px * var(--uiScale)); height: calc(54px * var(--uiScale)); }
+.btn-power{ right: calc(-2px * var(--uiScale)); top: calc(190px * var(--uiScale)); height: calc(70px * var(--uiScale)); }
+
+.screen{
+  position:relative;
+  width: var(--screenW);
+  height: var(--screenH);
+  border-radius: var(--radiusScreen);
+  overflow:hidden;
+  background:#000;
+  border: 1px solid rgba(255,255,255,.06);
+}
+
+.screen::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius: var(--radiusScreen);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.07),
+    inset 0 0 28px rgba(255,255,255,.05);
+}
+
+/* Wallpaper (home only) */
+.wallpaper{
+  position:absolute;
+  inset:0;
+  background-size: cover;
+  background-position: center;
+}
+.wallpaper.hidden{ display:none !important; }
+
+/* Apps: clean background + FULL SCREEN (no banner space) */
+.app-backdrop{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .18s ease;
+  background: var(--appDark);
+}
+:root[data-theme="light"] .app-backdrop{ background: var(--appLight); }
+.app-backdrop.show{ opacity:1; }
+
+/* Light theme text */
+:root[data-theme="light"]{
+  --text: rgba(10,12,16,.92);
+  --muted: rgba(10,12,16,.62);
+  --statusColor: rgba(10,12,16,.92); /* ✅ light status text */
+}
+
+/* Dark status text */
+:root:not([data-theme="light"]){
+  --statusColor: rgba(255,255,255,.95);
+}
+
+/* ===== STATUS BAR ===== */
+/* ✅ theme-driven status colors (NO hard white lock) */
+.sb-time,
+.sb-ico,
+.sb-ico *{
+  color: var(--statusColor) !important;
+  fill: var(--statusColor) !important;
+  stroke: var(--statusColor) !important;
+}
+
+.statusbar{
+  position:absolute;
+  top: calc(16px * var(--uiScale));
+  left: calc(18px * var(--uiScale));
+  right: calc(18px * var(--uiScale));
+  height: calc(30px * var(--uiScale));
+  z-index:999; /* ✅ always above apps */
+  pointer-events:none;
+
+  --islandW: calc(140px * var(--uiScale));
+  --islandH: calc(36px * var(--uiScale));
+  --islandGap: calc(12px * var(--uiScale));
+
+  --timeFontSize: calc(16px * var(--uiScale));
+  --timeFontWeight: 700;
+  --timeOffsetY: calc(2px * var(--uiScale));
+}
+
+/* Important: NO blur overlay / NO banner */
+.statusbar::before{ content:none !important; }
+
+/* Notch MUST NOT be see-through */
+.dynamic-island{
+  position:absolute;
+  top: 0px;
+  left:50%;
+  transform:translateX(-50%);
+  width: var(--islandW);
+  height: var(--islandH);
+  border-radius:999px;
+  background:#000; /* solid */
+  border:1px solid rgba(255,255,255,.10);
+  z-index:11;
+}
+
+.sb-left, .sb-right{
+  position:absolute;
+  top: calc(6px * var(--uiScale));
+  height: calc(18px * var(--uiScale));
+  display:flex;
+  align-items:center;
+  z-index:12;
+}
+.sb-left{
+  left: 0;
+  width: calc(50% - (var(--islandW) / 2) - var(--islandGap));
+  justify-content: center;
+  transform: translateY(var(--timeOffsetY));
+}
+.sb-right{
+  right: 0;
+  width: calc(50% - (var(--islandW) / 2) - var(--islandGap));
+  justify-content: center;
+  gap: calc(7px * var(--uiScale));
+}
+.sb-time{
+  font-size: var(--timeFontSize);
+  font-weight: var(--timeFontWeight);
+  letter-spacing: 0;
+  line-height: 1;
+  text-shadow: none;
+}
+
+/* ===== HOME LAYOUT ===== */
+.home-area{
+  position:absolute;
+  left:calc(18px * var(--uiScale));
+  right:calc(18px * var(--uiScale));
+  top:calc(104px * var(--uiScale));
+  bottom:calc(130px * var(--uiScale));
+  color:var(--text);
+}
+
+/* Grid pages */
+.pages-wrap{
+  position:absolute;
+  left: calc(18px * var(--uiScale));
+  right: calc(18px * var(--uiScale));
+  top: calc(104px * var(--uiScale));
+  bottom: calc(130px * var(--uiScale));
+  overflow:hidden;
+}
+.pages{
+  height:100%;
+  display:flex;
+  transition: transform 220ms ease;
+}
+.page{
+  width: calc(var(--screenW) - calc(36px * var(--uiScale)));
+  height:100%;
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: calc(14px * var(--uiScale));
+}
+
+.cell{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius: calc(18px * var(--uiScale));
+}
+.cell.hover{
+  outline: 2px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.06);
+}
+
+.icon{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  touch-action:none;
+}
+.icon img{
+  width: calc(62px * var(--uiScale));
+  height: calc(62px * var(--uiScale));
+  border-radius: calc(14px * var(--uiScale));
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25);
+}
+
+.editing .icon{
+  animation: jiggle 0.14s infinite alternate ease-in-out;
+  transform-origin: 50% 60%;
+}
+@keyframes jiggle{
+  from{ transform: rotate(-1.2deg) translateY(-1px); }
+  to  { transform: rotate( 1.2deg) translateY( 1px); }
+}
+
+.del-badge{
+  position:absolute;
+  top: calc(-8px * var(--uiScale));
+  right: calc(10px * var(--uiScale));
+  width: calc(22px * var(--uiScale));
+  height: calc(22px * var(--uiScale));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,.95);
+  font-weight: 1000;
+  font-size: calc(18px * var(--uiScale));
+  line-height: 1;
+  text-shadow:
+    0 2px 10px rgba(0,0,0,.65),
+    0 0 1px rgba(0,0,0,.85);
+}
+
+.dock{
+  position:absolute;
+  left:calc(18px * var(--uiScale));
+  right:calc(18px * var(--uiScale));
+  bottom:calc(18px * var(--uiScale));
+  height:calc(86px * var(--uiScale));
+  border-radius:calc(28px * var(--uiScale));
+  padding:calc(12px * var(--uiScale)) calc(16px * var(--uiScale));
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  z-index:20;
+  gap:calc(12px * var(--uiScale));
+}
+.dock.hidden{ display:none !important; }
+
+.dock-slot{
+  width: calc(64px * var(--uiScale));
+  height: calc(64px * var(--uiScale));
+  border-radius: calc(22px * var(--uiScale));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.dock-slot.empty{
+  background: rgba(255,255,255,.08);
+  border: 1px dashed rgba(255,255,255,.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+  opacity: .55;
+}
+.dock-slot.filled{ cursor:pointer; }
+.dock-slot.hover{ outline: 2px solid rgba(255,255,255,.22); }
+
+.page-dots{
+  position:absolute;
+  left:0; right:0;
+  bottom: calc(126px * var(--uiScale));
+  display:flex;
+  justify-content:center;
+  gap: calc(8px * var(--uiScale));
+  z-index:25;
+  pointer-events:none;
+}
+.dot{
+  width: calc(6px * var(--uiScale));
+  height: calc(6px * var(--uiScale));
+  border-radius: 999px;
+  background: rgba(255,255,255,0.35);
+}
+.dot.active{ background: rgba(255,255,255,0.88); }
+
+.homebar-wrap{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom: calc(22px * var(--uiScale));
+  display:flex;
+  justify-content:center;
+  z-index:30;
+}
+.homebar{
+  width: calc(140px * var(--uiScale));
+  height: calc(5px * var(--uiScale));
+  border-radius:999px;
+  background:rgba(255,255,255,.85);
+  box-shadow:0 6px 20px rgba(0,0,0,.22);
+  cursor:pointer;
+}
+.homebar.hidden{ display:none; }
+
+/* ===== APPS ===== */
+.app{
+  position:absolute;
+  inset:0;
+  display:none;
+  z-index:40;
+}
+
+.app-body{
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  bottom:0;
+  overflow-y:auto;
+
+  /* safe area padding, but statusbar stays above because z-index:999 */
+  padding:
+    calc(104px * var(--uiScale))
+    calc(18px * var(--uiScale))
+    calc(120px * var(--uiScale))
+    calc(18px * var(--uiScale));
+
+  color: var(--text);
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.app-body::-webkit-scrollbar{ width:0; height:0; }
+
+.homebar-fade{
+  position:absolute;
+  left:0; right:0;
+  bottom: 0;
+  height: calc(140px * var(--uiScale));
+  pointer-events:none;
+  background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.30));
+}
+
+.drag-ghost{
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: calc(64px * var(--uiScale));
+  height: calc(64px * var(--uiScale));
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9999;
+  opacity: .95;
+  filter: drop-shadow(0 18px 30px rgba(0,0,0,.45));
+}
+.drag-ghost img{
+  width:100%;
+  height:100%;
+  border-radius: calc(16px * var(--uiScale));
+}
+
+.glass-bubble{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.11) 45%, rgba(255,255,255,.06));
+  backdrop-filter: blur(var(--blur)) saturate(170%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(170%);
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.45),
+    inset 0 -1px 0 rgba(255,255,255,.10),
+    0 12px 30px rgba(0,0,0,.16);
+}
+
+.toast{
+  position:absolute;
+  top: calc(72px * var(--uiScale));
+  left:calc(18px * var(--uiScale));
+  right:calc(18px * var(--uiScale));
+  padding:calc(10px * var(--uiScale));
+  border-radius:calc(18px * var(--uiScale));
+  display:none;
+  z-index:40;
+}
+/* ===== App-only top readability scrim (SOFTER / MORE GRADUAL) ===== */
+.app-backdrop.show::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+
+  /* (1) where it starts */
+  top: calc(2px * var(--uiScale));
+
+  /* (2) how far down it goes */
+  height: calc(52px * var(--uiScale));
+
+  /* must be above app bg, below statusbar */
+  z-index: 900;
+  pointer-events:none;
+
+  /* (3) how dark it is (keep these low for “no banner” feel) */
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,.22) 0%,
+    rgba(0,0,0,.12) 42%,
+    rgba(0,0,0,.06) 68%,
+    rgba(0,0,0,0) 100%
+  );
+
+  /* (4) blur strength (lower = less blur) */
+  -webkit-backdrop-filter: blur(calc(1px * var(--uiScale))) saturate(120%);
+  backdrop-filter: blur(calc(1px * var(--uiScale))) saturate(120%);
+}
+
+/* Light mode: gentle white scrim */
+:root[data-theme="light"] .app-backdrop.show::after{
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,.36) 0%,
+    rgba(255,255,255,.20) 42%,
+    rgba(255,255,255,.10) 68%,
+    rgba(255,255,255,0) 100%
+  );
+}

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>skeet_phone</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="root" class="hidden">
+    <div class="phone-wrap open">
+      <div class="frame">
+        <div class="btn-side btn-mute"></div>
+        <div class="btn-side btn-vol-up"></div>
+        <div class="btn-side btn-vol-down"></div>
+        <div class="btn-side btn-power"></div>
+
+        <div class="screen">
+          <div class="wallpaper" id="wallpaper"></div>
+
+          <!-- Shown ONLY when in apps -->
+          <div class="app-backdrop" id="appBackdrop"></div>
+
+          <div class="statusbar">
+            <div class="sb-left"><span id="sbTime" class="sb-time">--:--</span></div>
+            <div class="dynamic-island"></div>
+            <div class="sb-right" id="sbRight"></div>
+          </div>
+
+          <!-- HOME -->
+          <div class="home" id="homeView">
+            <div class="pages-wrap" id="pagesWrap">
+              <div class="pages" id="pages"></div>
+            </div>
+            <div class="page-dots" id="pageDots"></div>
+            <div class="dock glass-bubble" id="dock"></div>
+
+            <div class="edit-hint glass-bubble" id="editHint">
+              Edit Mode • Tap empty space to exit
+            </div>
+          </div>
+
+          <!-- APP -->
+          <div class="app" id="appView">
+            <div class="app-body" id="appBody"></div>
+
+            <!-- bottom fade so app content flows behind the home bar -->
+            <div class="homebar-fade" aria-hidden="true"></div>
+
+            <div class="homebar-wrap">
+              <div id="homebar" class="homebar"></div>
+            </div>
+          </div>
+
+          <div class="toast glass-bubble" id="toast"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
